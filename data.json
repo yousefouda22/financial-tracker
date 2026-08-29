@@ -1,0 +1,163 @@
+{
+  "wallets": [
+    {
+      "id": "w_1787950411781",
+      "name": "بنك فلسطين",
+      "currency": "USD",
+      "initialBalance": 8580,
+      "icon": "fa-building-columns",
+      "currentBalance": 8580
+    },
+    {
+      "id": "w_1787950488126",
+      "name": "بنك فلسطين",
+      "currency": "ILS",
+      "initialBalance": 66,
+      "icon": "fa-building-columns",
+      "currentBalance": 65
+    },
+    {
+      "id": "w_1787950539088",
+      "name": "بايننس",
+      "currency": "USD",
+      "initialBalance": 1137,
+      "icon": "fa-building-columns",
+      "currentBalance": 1137
+    },
+    {
+      "id": "w_1787950598356",
+      "name": "ترست والت",
+      "currency": "USD",
+      "initialBalance": 8527,
+      "icon": "fa-wallet",
+      "currentBalance": 8527
+    },
+    {
+      "id": "w_1787950665496",
+      "name": "باي بت",
+      "currency": "USD",
+      "initialBalance": 4028,
+      "icon": "fa-wallet",
+      "currentBalance": 4028
+    },
+    {
+      "id": "w_1787950771871",
+      "name": "ترون",
+      "currency": "USD",
+      "initialBalance": 2197,
+      "icon": "fa-coins",
+      "currentBalance": 2197
+    },
+    {
+      "id": "w_1787950829866",
+      "name": "كيو كوين",
+      "currency": "USD",
+      "initialBalance": 2100,
+      "icon": "fa-coins",
+      "currentBalance": 2100
+    },
+    {
+      "id": "w_1787950887352",
+      "name": "احمد اخوي",
+      "currency": "USD",
+      "initialBalance": 1000,
+      "icon": "fa-building-columns",
+      "currentBalance": 1000
+    },
+    {
+      "id": "w_1787950908812",
+      "name": "جوال باي",
+      "currency": "ILS",
+      "initialBalance": 500,
+      "icon": "fa-building-columns",
+      "currentBalance": 500
+    },
+    {
+      "id": "w_1787950928135",
+      "name": "تليجرام",
+      "currency": "USD",
+      "initialBalance": 200,
+      "icon": "fa-building-columns",
+      "currentBalance": 200
+    },
+    {
+      "id": "w_1787950956987",
+      "name": "ريدوت باي",
+      "currency": "USD",
+      "initialBalance": 66,
+      "icon": "fa-credit-card",
+      "currentBalance": 66
+    }
+  ],
+  "transactions": [
+    {
+      "id": "t_1787952865953",
+      "type": "expense",
+      "walletId": "w_1787950488126",
+      "amount": 1,
+      "currency": "ILS",
+      "category": "food",
+      "note": "",
+      "date": "2026-08-28T21:34:00.000Z"
+    },
+    {
+      "id": "t_1787952946657",
+      "type": "expense",
+      "walletId": "w_1787950411781",
+      "amount": 1,
+      "currency": "ILS",
+      "category": "food",
+      "note": "",
+      "date": "2026-08-28T21:35:00.000Z"
+    },
+    {
+      "id": "t_1787952997148",
+      "type": "expense",
+      "walletId": "w_1787950488126",
+      "amount": 1,
+      "currency": "ILS",
+      "category": "other_exp",
+      "note": "عملية خصم من التليجرام",
+      "date": "2026-08-28T21:36:37.148Z"
+    },
+    {
+      "id": "t_1787953032817",
+      "type": "expense",
+      "walletId": "w_1787950488126",
+      "amount": 1,
+      "currency": "ILS",
+      "category": "other_exp",
+      "note": "من بايننس",
+      "date": "2026-08-28T21:37:12.817Z"
+    }
+  ],
+  "debts": [
+    {
+      "id": "d_1787951042551",
+      "type": "receivable",
+      "person": "احمد السباح",
+      "amount": 27,
+      "currency": "USD",
+      "settledAmount": 0,
+      "note": "اشتراك داونلود مانجر ومطهم",
+      "dueDate": "",
+      "status": "pending"
+    },
+    {
+      "id": "d_1787951071339",
+      "type": "receivable",
+      "person": "مومن",
+      "amount": 80,
+      "currency": "ILS",
+      "settledAmount": 0,
+      "note": "",
+      "dueDate": "",
+      "status": "pending"
+    }
+  ],
+  "telegramConfig": {
+    "enabled": true,
+    "botToken": "8935915600:AAHbkbV8nKHAfasjH2IRAwKXcam1pdEgIvk",
+    "chatId": "1327968743"
+  }
+}
