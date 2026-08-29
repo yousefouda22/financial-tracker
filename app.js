@@ -96,11 +96,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Load state from server API or localStorage fallback
 async function loadState() {
+    let apiUrl = '/api/data';
+    if (window.location.protocol === 'file:') {
+        apiUrl = 'http://localhost:8080/api/data';
+    }
+
     try {
-        const res = await fetch('/api/data');
+        const res = await fetch(apiUrl);
         if (res.ok) {
             const data = await res.json();
-            if (data && Array.isArray(data.wallets)) {
+            if (data && Array.isArray(data.wallets) && data.wallets.length > 0) {
                 state = data;
                 localStorage.setItem('financial_tracker_data_v1', JSON.stringify(state));
                 updateUI();
@@ -108,20 +113,20 @@ async function loadState() {
             }
         }
     } catch (e) {
-        console.warn('Server API not reachable, loading from LocalStorage:', e);
+        console.warn('Server API not reachable:', e);
     }
 
     // LocalStorage fallback
     const saved = localStorage.getItem('financial_tracker_data_v1');
     if (saved) {
         try {
-            state = JSON.parse(saved);
+            const parsed = JSON.parse(saved);
+            if (parsed && Array.isArray(parsed.wallets) && parsed.wallets.length > 0) {
+                state = parsed;
+            }
         } catch (e) {
-            console.error('Failed to parse saved data, resetting to default:', e);
-            state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+            console.error('Failed to parse saved data:', e);
         }
-    } else {
-        state = JSON.parse(JSON.stringify(DEFAULT_STATE));
     }
     updateUI();
 }
@@ -129,8 +134,12 @@ async function loadState() {
 // Save state to server API & LocalStorage
 async function saveState() {
     localStorage.setItem('financial_tracker_data_v1', JSON.stringify(state));
+    let apiUrl = '/api/data';
+    if (window.location.protocol === 'file:') {
+        apiUrl = 'http://localhost:8080/api/data';
+    }
     try {
-        await fetch('/api/data', {
+        await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(state)
@@ -140,24 +149,30 @@ async function saveState() {
     }
 }
 
-// Auto-sync polling every 5 seconds for live multi-device updates
+// Auto-sync polling every 3 seconds for live multi-device updates
 setInterval(async () => {
+    let apiUrl = '/api/data';
+    if (window.location.protocol === 'file:') {
+        apiUrl = 'http://localhost:8080/api/data';
+    }
     try {
-        const res = await fetch('/api/data');
+        const res = await fetch(apiUrl);
         if (res.ok) {
             const data = await res.json();
-            const currentStr = JSON.stringify(state);
-            const serverStr = JSON.stringify(data);
-            if (currentStr !== serverStr) {
-                state = data;
-                localStorage.setItem('financial_tracker_data_v1', serverStr);
-                updateUI();
+            if (data && Array.isArray(data.wallets) && data.wallets.length > 0) {
+                const currentStr = JSON.stringify(state);
+                const serverStr = JSON.stringify(data);
+                if (currentStr !== serverStr) {
+                    state = data;
+                    localStorage.setItem('financial_tracker_data_v1', serverStr);
+                    updateUI();
+                }
             }
         }
     } catch (e) {
         // Silent fail if offline
     }
-}, 5000);
+}, 3000);
 
 // Set default datetime to now in modals
 function setDefaultDateInput() {
@@ -626,16 +641,6 @@ function renderDebts() {
                     <span class="font-bold text-slate-300">المبلغ المتبقي:</span>
                     <span class="font-black ${isFullySettled ? 'text-slate-500 line-through' : (isRec ? 'text-emerald-400' : 'text-red-400')}">
                         ${formatAmountDisplay(remaining, symbol, isUsd)}
-                    </span>
-                </div>
-            </div>`;ify-between text-xs">
-                    <span class="text-slate-400">المسدد سابقاً:</span>
-                    <span class="font-bold text-emerald-400">${formatNumber(debt.settledAmount || 0)} ${symbol}</span>
-                </div>
-                <div class="flex justify-between text-sm pt-2 border-t border-slate-700/60">
-                    <span class="font-bold text-slate-300">المبلغ المتبقي:</span>
-                    <span class="font-black ${isFullySettled ? 'text-slate-500 line-through' : (isRec ? 'text-emerald-400' : 'text-red-400')}">
-                        ${formatNumber(remaining)} ${symbol}
                     </span>
                 </div>
             </div>
