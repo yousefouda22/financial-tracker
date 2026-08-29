@@ -139,6 +139,16 @@
       "category": "food",
       "note": "كولا وشوكلاته",
       "date": "2026-08-29T12:19:00.000Z"
+    },
+    {
+      "id": "t_1788006827317",
+      "type": "expense",
+      "walletId": "w_1787950488126",
+      "amount": 5,
+      "currency": "ILS",
+      "category": "bills",
+      "note": "ورق نت",
+      "date": "2026-08-29T12:33:00.000Z"
     }
   ],
   "debts": [

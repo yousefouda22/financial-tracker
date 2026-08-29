@@ -447,35 +447,46 @@ function renderWalletsList() {
         const isUsd = wallet.currency === 'USD';
 
         const card = document.createElement('div');
-        card.className = "bg-slate-800/90 border border-slate-700/70 rounded-2xl p-5 shadow-xl space-y-4 relative overflow-hidden group hover:border-slate-600 transition";
+        card.className = "bg-slate-800/90 border border-slate-700/70 rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4 hover:border-slate-600 transition";
         card.innerHTML = `
-            <div class="flex items-center justify-between">
+            <div class="flex items-start justify-between gap-3">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl ${isUsd ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'} flex items-center justify-center text-xl font-bold shadow-inner">
+                    <div class="w-11 h-11 rounded-2xl ${isUsd ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'} flex items-center justify-center text-lg font-bold shrink-0 shadow-inner">
                         <i class="fa-solid ${wallet.icon || 'fa-building-columns'}"></i>
                     </div>
                     <div>
-                        <h3 class="text-base font-bold text-white">${wallet.name}</h3>
-                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold ${isUsd ? 'bg-blue-500/10 text-blue-300' : 'bg-emerald-500/10 text-emerald-300'}">
-                            ${wallet.currency === 'USD' ? 'حساب دولار ($)' : 'حساب شيكل (₪)'}
+                        <h3 class="text-sm font-bold text-white leading-tight">${wallet.name}</h3>
+                        <span class="inline-block mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${isUsd ? 'bg-blue-500/10 text-blue-300' : 'bg-emerald-500/10 text-emerald-300'}">
+                            ${isUsd ? 'حساب دولار ($)' : 'حساب شيكل (₪)'}
                         </span>
                     </div>
                 </div>
-                <div class="flex items-center gap-1">
-                    <button onclick="editWallet('${wallet.id}')" title="تعديل المحفظة" class="text-slate-            <div class="pt-2 border-t border-slate-700/50">
-                <div class="text-xs text-slate-400 mb-1">الرصيد الحالي المتوفر:</div>
+                <div class="flex items-center gap-1 shrink-0">
+                    <button onclick="editWallet('${wallet.id}')" title="تعديل المحفظة" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-700/60 transition">
+                        <i class="fa-solid fa-pen-to-square text-xs"></i>
+                    </button>
+                    <button onclick="deleteWallet('${wallet.id}')" title="حذف المحفظة" class="text-slate-400 hover:text-red-400 p-1.5 rounded-lg hover:bg-slate-700/60 transition">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-700/50 space-y-1">
+                <div class="text-[11px] font-semibold text-slate-400">الرصيد الحالي المتوفر:</div>
                 <div class="text-2xl font-black ${wallet.currentBalance >= 0 ? (isUsd ? 'text-blue-400' : 'text-emerald-400') : 'text-red-400'}">
                     ${formatAmountDisplay(wallet.currentBalance, symbol, isUsd)}
                 </div>
-                <div class="text-[11px] text-slate-500 mt-1">الرصيد الأولي عند التأسيس: ${formatAmountDisplay(wallet.initialBalance, symbol, isUsd)}</div>
+                <div class="text-[11px] text-slate-500">الرصيد الأولي عند التأسيس: ${formatAmountDisplay(wallet.initialBalance, symbol, isUsd)}</div>
             </div>
 
-            <div class="flex gap-2 pt-2">
-                <button onclick="quickTransactionForWallet('${wallet.id}', 'expense')" class="flex-1 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-minus me-1"></i> خصم
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="quickTransactionForWallet('${wallet.id}', 'expense')" class="py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-red-500/20">
+                    <i class="fa-solid fa-minus"></i>
+                    <span>خصم</span>
                 </button>
-                <button onclick="quickTransactionForWallet('${wallet.id}', 'income')" class="flex-1 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-plus me-1"></i> إضافة
+                <button onclick="quickTransactionForWallet('${wallet.id}', 'income')" class="py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-emerald-500/20">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>إضافة</span>
                 </button>
             </div>
         `;
