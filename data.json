@@ -6,7 +6,7 @@
       "currency": "USD",
       "initialBalance": 8580,
       "icon": "fa-building-columns",
-      "currentBalance": 8580
+      "currentBalance": 8575
     },
     {
       "id": "w_1787950488126",
@@ -14,7 +14,7 @@
       "currency": "ILS",
       "initialBalance": 66,
       "icon": "fa-building-columns",
-      "currentBalance": 65
+      "currentBalance": 63
     },
     {
       "id": "w_1787950539088",
@@ -129,6 +129,16 @@
       "category": "other_exp",
       "note": "من بايننس",
       "date": "2026-08-28T21:37:12.817Z"
+    },
+    {
+      "id": "t_1788005975051",
+      "type": "expense",
+      "walletId": "w_1787950411781",
+      "amount": 4,
+      "currency": "ILS",
+      "category": "food",
+      "note": "كولا وشوكلاته",
+      "date": "2026-08-29T12:19:00.000Z"
     }
   ],
   "debts": [

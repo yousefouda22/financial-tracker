@@ -83,12 +83,14 @@ let state = {
 };
 
 let categoryChartInstance = null;
+let isPrivacyMode = localStorage.getItem('financial_tracker_privacy') === 'true';
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
     loadState();
     setDefaultDateInput();
     renderWalletIconSelector();
+    updatePrivacyIcon();
     updateUI();
 });
 
@@ -205,8 +207,8 @@ function renderDashboardStats() {
         if (w.currency === 'USD') totalUsd += w.currentBalance;
     });
 
-    document.getElementById('total-balance-ils').textContent = `${formatNumber(totalIls)} ₪`;
-    document.getElementById('total-balance-usd').textContent = `$${formatNumber(totalUsd)}`;
+    document.getElementById('total-balance-ils').textContent = formatAmountDisplay(totalIls, '₪');
+    document.getElementById('total-balance-usd').textContent = formatAmountDisplay(totalUsd, '$', true);
 
     // 2. Current Month Income & Expense Calculations
     const now = new Date();
@@ -234,11 +236,11 @@ function renderDashboardStats() {
         }
     });
 
-    document.getElementById('month-expense-ils').textContent = `${formatNumber(monthExpIls)} ₪`;
-    document.getElementById('month-expense-usd').textContent = `$${formatNumber(monthExpUsd)}`;
+    document.getElementById('month-expense-ils').textContent = formatAmountDisplay(monthExpIls, '₪');
+    document.getElementById('month-expense-usd').textContent = formatAmountDisplay(monthExpUsd, '$', true);
     
-    document.getElementById('month-income-ils').textContent = `${formatNumber(monthIncIls)} ₪`;
-    document.getElementById('month-income-usd').textContent = `$${formatNumber(monthIncUsd)}`;
+    document.getElementById('month-income-ils').textContent = formatAmountDisplay(monthIncIls, '₪');
+    document.getElementById('month-income-usd').textContent = formatAmountDisplay(monthIncUsd, '$', true);
 
     // 3. Recent Transactions Table Preview in Dashboard (Last 5)
     const recentTbody = document.getElementById('recent-transactions-tbody');
@@ -254,6 +256,7 @@ function renderDashboardStats() {
             const catObj = getCategoryObj(t.type, t.category);
             const isExp = t.type === 'expense';
             const currSymbol = t.currency === 'USD' ? '$' : '₪';
+            const isPrefix = t.currency === 'USD';
 
             const tr = document.createElement('tr');
             tr.className = "border-b border-slate-700/40 hover:bg-slate-800/50 transition";
@@ -268,7 +271,7 @@ function renderDashboardStats() {
                     <span>${wallet ? wallet.name : 'غير محدد'}</span>
                 </td>
                 <td class="px-4 py-3 font-bold ${isExp ? 'text-red-400' : 'text-emerald-400'}">
-                    ${isExp ? '-' : '+'}${formatNumber(t.amount)} ${currSymbol}
+                    ${isExp ? '-' : '+'}${formatAmountDisplay(t.amount, currSymbol, isPrefix)}
                 </td>
                 <td class="px-4 py-3">
                     <span class="inline-flex items-center gap-1.5 text-xs text-slate-300">
@@ -288,6 +291,7 @@ function renderDashboardStats() {
     dashWalletsList.innerHTML = '';
     state.wallets.forEach(w => {
         const symbol = w.currency === 'USD' ? '$' : '₪';
+        const isPrefix = w.currency === 'USD';
         const div = document.createElement('div');
         div.className = "flex items-center justify-between p-3 rounded-xl bg-slate-900/60 border border-slate-700/50";
         div.innerHTML = `
@@ -301,7 +305,7 @@ function renderDashboardStats() {
                 </div>
             </div>
             <div class="text-sm font-extrabold ${w.currentBalance >= 0 ? 'text-white' : 'text-red-400'}">
-                ${formatNumber(w.currentBalance)} ${symbol}
+                ${formatAmountDisplay(w.currentBalance, symbol, isPrefix)}
             </div>
         `;
         dashWalletsList.appendChild(div);
@@ -443,21 +447,12 @@ function renderWalletsList() {
                     </div>
                 </div>
                 <div class="flex items-center gap-1">
-                    <button onclick="editWallet('${wallet.id}')" title="تعديل المحفظة" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-700/60 transition">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    <button onclick="deleteWallet('${wallet.id}')" title="حذف المحفظة" class="text-slate-400 hover:text-red-400 p-1.5 rounded-lg hover:bg-slate-700/60 transition">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="pt-2 border-t border-slate-700/50">
+                    <button onclick="editWallet('${wallet.id}')" title="تعديل المحفظة" class="text-slate-            <div class="pt-2 border-t border-slate-700/50">
                 <div class="text-xs text-slate-400 mb-1">الرصيد الحالي المتوفر:</div>
                 <div class="text-2xl font-black ${wallet.currentBalance >= 0 ? (isUsd ? 'text-blue-400' : 'text-emerald-400') : 'text-red-400'}">
-                    ${formatNumber(wallet.currentBalance)} ${symbol}
+                    ${formatAmountDisplay(wallet.currentBalance, symbol, isUsd)}
                 </div>
-                <div class="text-[11px] text-slate-500 mt-1">الرصيد الأولي عند التأسيس: ${formatNumber(wallet.initialBalance)} ${symbol}</div>
+                <div class="text-[11px] text-slate-500 mt-1">الرصيد الأولي عند التأسيس: ${formatAmountDisplay(wallet.initialBalance, symbol, isUsd)}</div>
             </div>
 
             <div class="flex gap-2 pt-2">
@@ -516,6 +511,7 @@ function renderTransactions() {
         const catObj = getCategoryObj(t.type, t.category);
         const isExp = t.type === 'expense';
         const currSymbol = t.currency === 'USD' ? '$' : '₪';
+        const isPrefix = t.currency === 'USD';
 
         const tr = document.createElement('tr');
         tr.className = "border-b border-slate-700/40 hover:bg-slate-800/50 transition";
@@ -530,7 +526,7 @@ function renderTransactions() {
                 <span>${wallet ? wallet.name : 'غير محدد'}</span>
             </td>
             <td class="px-4 py-3 font-bold ${isExp ? 'text-red-400' : 'text-emerald-400'}">
-                ${isExp ? '-' : '+'}${formatNumber(t.amount)} ${currSymbol}
+                ${isExp ? '-' : '+'}${formatAmountDisplay(t.amount, currSymbol, isPrefix)}
             </td>
             <td class="px-4 py-3">
                 <span class="inline-flex items-center gap-1.5 text-xs text-slate-300">
@@ -573,10 +569,10 @@ function renderDebts() {
         }
     });
 
-    document.getElementById('total-debts-receivable-ils').textContent = `${formatNumber(recIls)} ₪`;
-    document.getElementById('total-debts-receivable-usd').textContent = `$${formatNumber(recUsd)}`;
-    document.getElementById('total-debts-payable-ils').textContent = `${formatNumber(payIls)} ₪`;
-    document.getElementById('total-debts-payable-usd').textContent = `$${formatNumber(payUsd)}`;
+    document.getElementById('total-debts-receivable-ils').textContent = formatAmountDisplay(recIls, '₪');
+    document.getElementById('total-debts-receivable-usd').textContent = formatAmountDisplay(recUsd, '$', true);
+    document.getElementById('total-debts-payable-ils').textContent = formatAmountDisplay(payIls, '₪');
+    document.getElementById('total-debts-payable-usd').textContent = formatAmountDisplay(payUsd, '$', true);
 
     if (state.debts.length === 0) {
         grid.innerHTML = `
@@ -594,6 +590,7 @@ function renderDebts() {
         const isFullySettled = remaining <= 0;
         const isRec = debt.type === 'receivable';
         const symbol = debt.currency === 'USD' ? '$' : '₪';
+        const isUsd = debt.currency === 'USD';
 
         const card = document.createElement('div');
         card.className = `bg-slate-800/90 border rounded-2xl p-5 shadow-xl space-y-4 relative overflow-hidden ${isFullySettled ? 'border-slate-700 opacity-60' : (isRec ? 'border-emerald-500/50' : 'border-red-500/50')}`;
@@ -619,9 +616,19 @@ function renderDebts() {
             <div class="space-y-2 bg-slate-900/60 p-3.5 rounded-xl border border-slate-700/50">
                 <div class="flex justify-between text-xs">
                     <span class="text-slate-400">المبلغ الإجمالي:</span>
-                    <span class="font-bold text-white">${formatNumber(debt.amount)} ${symbol}</span>
+                    <span class="font-bold text-white">${formatAmountDisplay(debt.amount, symbol, isUsd)}</span>
                 </div>
                 <div class="flex justify-between text-xs">
+                    <span class="text-slate-400">المسدد سابقاً:</span>
+                    <span class="font-bold text-emerald-400">${formatAmountDisplay(debt.settledAmount || 0, symbol, isUsd)}</span>
+                </div>
+                <div class="flex justify-between text-sm pt-2 border-t border-slate-700/60">
+                    <span class="font-bold text-slate-300">المبلغ المتبقي:</span>
+                    <span class="font-black ${isFullySettled ? 'text-slate-500 line-through' : (isRec ? 'text-emerald-400' : 'text-red-400')}">
+                        ${formatAmountDisplay(remaining, symbol, isUsd)}
+                    </span>
+                </div>
+            </div>`;ify-between text-xs">
                     <span class="text-slate-400">المسدد سابقاً:</span>
                     <span class="font-bold text-emerald-400">${formatNumber(debt.settledAmount || 0)} ${symbol}</span>
                 </div>
@@ -1134,6 +1141,39 @@ async function testTelegramNotification() {
         }
     } catch (e) {
         showToast('حدث خطأ في الاتصال بالخادم', 'danger');
+    }
+}
+
+/* Privacy Mode Functions */
+function formatAmountDisplay(num, symbol, isPrefix = false) {
+    if (isPrivacyMode) {
+        return isPrefix ? `${symbol} ••••••` : `•••••• ${symbol}`;
+    }
+    const formatted = formatNumber(num);
+    return isPrefix ? `${symbol}${formatted}` : `${formatted} ${symbol}`;
+}
+
+function togglePrivacyMode() {
+    isPrivacyMode = !isPrivacyMode;
+    localStorage.setItem('financial_tracker_privacy', isPrivacyMode);
+    updatePrivacyIcon();
+    updateUI();
+    showToast(isPrivacyMode ? 'تم إخفاء المبالغ 🙈' : 'تم إظهار المبالغ 👁️', 'info');
+}
+
+function updatePrivacyIcon() {
+    const icon = document.getElementById('privacy-icon');
+    const btn = document.getElementById('toggle-privacy-btn');
+    if (!icon || !btn) return;
+
+    if (isPrivacyMode) {
+        icon.className = 'fa-solid fa-eye-slash text-amber-400 text-base';
+        btn.classList.add('bg-amber-500/20', 'border', 'border-amber-500/40');
+        btn.title = 'إظهار المبالغ';
+    } else {
+        icon.className = 'fa-solid fa-eye text-base';
+        btn.classList.remove('bg-amber-500/20', 'border', 'border-amber-500/40');
+        btn.title = 'إخفاء المبالغ';
     }
 }
 
