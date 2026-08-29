@@ -190,7 +190,6 @@ function updateUI() {
     renderDebts();
     updateDashboardCharts();
     populateWalletSelects();
-    updateCategoryOptions();
 }
 
 // Calculate Dynamic Current Balance for Each Wallet
@@ -679,6 +678,7 @@ function populateWalletSelects() {
     const filterSelect = document.getElementById('filter-wallet');
 
     if (transSelect) {
+        const currentTransVal = transSelect.value;
         transSelect.innerHTML = '';
         state.wallets.forEach(w => {
             const symbol = w.currency === 'USD' ? '$' : '₪';
@@ -687,9 +687,13 @@ function populateWalletSelects() {
             opt.textContent = `${w.name} (الرصيد: ${formatNumber(w.currentBalance)} ${symbol})`;
             transSelect.appendChild(opt);
         });
+        if (currentTransVal && state.wallets.some(w => w.id === currentTransVal)) {
+            transSelect.value = currentTransVal;
+        }
     }
 
     if (filterSelect) {
+        const currentFilterVal = filterSelect.value;
         filterSelect.innerHTML = '<option value="all">جميع المحافظ والبنوك</option>';
         state.wallets.forEach(w => {
             const opt = document.createElement('option');
@@ -697,6 +701,9 @@ function populateWalletSelects() {
             opt.textContent = w.name;
             filterSelect.appendChild(opt);
         });
+        if (currentFilterVal) {
+            filterSelect.value = currentFilterVal;
+        }
     }
 }
 
@@ -715,6 +722,7 @@ function updateCategoryOptions() {
     const catSelect = document.getElementById('trans-category');
     if (!catSelect) return;
 
+    const currentVal = catSelect.value;
     catSelect.innerHTML = '';
     const list = isExpense ? CATEGORIES.expense : CATEGORIES.income;
 
@@ -724,6 +732,10 @@ function updateCategoryOptions() {
         opt.textContent = c.name;
         catSelect.appendChild(opt);
     });
+
+    if (currentVal && list.some(c => c.id === currentVal)) {
+        catSelect.value = currentVal;
+    }
 }
 
 // Render Wallet Icons Selection in Modal

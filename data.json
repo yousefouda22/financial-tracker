@@ -14,7 +14,7 @@
       "currency": "ILS",
       "initialBalance": 66,
       "icon": "fa-building-columns",
-      "currentBalance": 63
+      "currentBalance": 58
     },
     {
       "id": "w_1787950539088",
@@ -70,7 +70,7 @@
       "currency": "ILS",
       "initialBalance": 500,
       "icon": "fa-building-columns",
-      "currentBalance": 500
+      "currentBalance": 323
     },
     {
       "id": "w_1787950928135",
@@ -149,6 +149,26 @@
       "category": "bills",
       "note": "ورق نت",
       "date": "2026-08-29T12:33:00.000Z"
+    },
+    {
+      "id": "t_1788030194881",
+      "type": "expense",
+      "walletId": "w_1787950908812",
+      "amount": 45,
+      "currency": "ILS",
+      "category": "food",
+      "note": "العشي مشتريات",
+      "date": "2026-08-29T19:03:00.000Z"
+    },
+    {
+      "id": "t_1788030206607",
+      "type": "expense",
+      "walletId": "w_1787950908812",
+      "amount": 20,
+      "currency": "ILS",
+      "category": "food",
+      "note": "مول الدنف صدر جاج",
+      "date": "2026-08-29T19:03:00.000Z"
     }
   ],
   "debts": [
