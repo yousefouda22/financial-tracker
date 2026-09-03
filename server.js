@@ -621,8 +621,8 @@ const MIME_TYPES = {
     '.json': 'application/json; charset=utf-8'
 };
 
-// HTTP Server
-const server = http.createServer((req, res) => {
+// Request Handler (compatible with both local http and Vercel Serverless)
+const requestHandler = (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -807,7 +807,7 @@ const server = http.createServer((req, res) => {
         res.writeHead(200, { 'Content-Type': contentType });
         fs.createReadStream(filePath).pipe(res);
     });
-});
+};
 
 function getLocalIp() {
     const interfaces = os.networkInterfaces();
@@ -822,6 +822,7 @@ function getLocalIp() {
 }
 
 if (!process.env.VERCEL) {
+    const server = http.createServer(requestHandler);
     server.listen(PORT, '0.0.0.0', () => {
         const localIp = getLocalIp();
         console.log(`\n==================================================`);
@@ -832,4 +833,5 @@ if (!process.env.VERCEL) {
     });
 }
 
-module.exports = server;
+// Vercel Serverless export
+module.exports = requestHandler;
