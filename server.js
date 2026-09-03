@@ -823,3 +823,5 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log(`📱 On your Mobile open:  http://${localIp}:${PORT}`);
     console.log(`==================================================\n`);
 });
+
+module.exports = server;
