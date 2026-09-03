@@ -3,6 +3,13 @@
  * Multi-Currency Expense, Income, Wallet & Debt Management System
  */
 
+// Guard: prevent execution in Node.js/Vercel server environment (no browser APIs)
+if (typeof window === 'undefined') {
+    if (typeof module !== 'undefined') module.exports = {};
+    return;
+}
+
+
 // Categories Configuration
 const CATEGORIES = {
     expense: [
