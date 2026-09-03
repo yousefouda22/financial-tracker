@@ -10,7 +10,7 @@ const os = require('os');
 const crypto = require('crypto');
 
 const PORT = process.env.PORT || 8080;
-const DATA_FILE = path.join(__dirname, 'data.json');
+const DATA_FILE = process.env.VERCEL ? '/tmp/data.json' : path.join(__dirname, 'data.json');
 
 // Password Hashing Helper
 function hashPassword(password) {
@@ -90,7 +90,11 @@ function loadDB() {
 }
 
 function saveDB() {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), 'utf8');
+    try {
+        fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), 'utf8');
+    } catch (e) {
+        console.warn('Could not write database to disk (Vercel read-only fallback):', e.message);
+    }
 }
 
 loadDB();
@@ -605,7 +609,9 @@ async function pollTelegramUpdates() {
     setTimeout(pollTelegramUpdates, 2000);
 }
 
-pollTelegramUpdates();
+if (!process.env.VERCEL) {
+    pollTelegramUpdates();
+}
 
 // MIME Types
 const MIME_TYPES = {
@@ -815,13 +821,15 @@ function getLocalIp() {
     return 'localhost';
 }
 
-server.listen(PORT, '0.0.0.0', () => {
-    const localIp = getLocalIp();
-    console.log(`\n==================================================`);
-    console.log(`🚀 Multi-User Financial Tracker Server is running!`);
-    console.log(`💻 On your PC open:      http://localhost:${PORT}`);
-    console.log(`📱 On your Mobile open:  http://${localIp}:${PORT}`);
-    console.log(`==================================================\n`);
-});
+if (!process.env.VERCEL) {
+    server.listen(PORT, '0.0.0.0', () => {
+        const localIp = getLocalIp();
+        console.log(`\n==================================================`);
+        console.log(`🚀 Multi-User Financial Tracker Server is running!`);
+        console.log(`💻 On your PC open:      http://localhost:${PORT}`);
+        console.log(`📱 On your Mobile open:  http://${localIp}:${PORT}`);
+        console.log(`==================================================\n`);
+    });
+}
 
 module.exports = server;
