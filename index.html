@@ -61,6 +61,13 @@
 
                 <!-- Action Buttons Header -->
                 <div class="flex items-center gap-2">
+                    <div id="user-profile-badge" class="hidden sm:flex items-center gap-2 bg-slate-700/80 px-3 py-1.5 rounded-xl border border-slate-600 text-xs">
+                        <i class="fa-solid fa-user-circle text-brand-400 text-sm"></i>
+                        <span id="header-username" class="font-bold text-white">yousef</span>
+                        <button onclick="handleLogout()" title="تسجيل الخروج" class="text-slate-400 hover:text-red-400 ms-1 transition">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </div>
                     <button onclick="togglePrivacyMode()" id="toggle-privacy-btn" title="إخفاء / إظهار المبالغ" class="bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white p-2.5 rounded-xl transition flex items-center justify-center">
                         <i id="privacy-icon" class="fa-solid fa-eye text-base"></i>
                     </button>
@@ -735,6 +742,51 @@
                         <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-600/20">حفظ الإعدادات</button>
                     </div>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 6. Authentication Modal (Login / Register) -->
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-6">
+            <div class="text-center space-y-2">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-400 mx-auto flex items-center justify-center shadow-lg shadow-brand-500/20 text-white text-2xl">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">أهلاً بك في محفظتي المالية</h3>
+                <p class="text-xs text-slate-400">يرجى تسجيل الدخول أو إنشاء حساب لحماية وحفظ بياناتك</p>
+            </div>
+
+            <!-- Auth Tabs -->
+            <div class="flex bg-slate-800 p-1 rounded-2xl border border-slate-700">
+                <button onclick="switchAuthTab('login')" id="auth-tab-login" class="flex-1 py-2 text-xs font-bold rounded-xl transition bg-brand-600 text-white">تسجيل الدخول</button>
+                <button onclick="switchAuthTab('register')" id="auth-tab-register" class="flex-1 py-2 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white">إنشاء حساب جديد</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">اسم المستخدم</label>
+                    <input type="text" id="login-username" required placeholder="ادخل اسم المستخدم..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">كلمة المرور</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-bold transition shadow-lg shadow-brand-600/20">تسجيل الدخول</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" onsubmit="handleRegisterSubmit(event)" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">اسم المستخدم الجديد</label>
+                    <input type="text" id="reg-username" required placeholder="اختر اسم مستخدم..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">كلمة المرور (أقلها 4 أحرف)</label>
+                    <input type="password" id="reg-password" required minlength="4" placeholder="••••••••" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+                </div>
+                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-bold transition shadow-lg shadow-emerald-600/20">إنشاء الحساب الآن</button>
             </form>
         </div>
     </div>

@@ -94,20 +94,46 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUI();
 });
 
+let authToken = localStorage.getItem('financial_tracker_token') || '';
+let currentUser = localStorage.getItem('financial_tracker_user') || 'yousef';
+
+// Update Header User Badge
+function updateHeaderUserBadge() {
+    const badge = document.getElementById('user-profile-badge');
+    const nameSpan = document.getElementById('header-username');
+    if (nameSpan) nameSpan.textContent = currentUser || 'مستخدم';
+    if (badge) {
+        if (currentUser) badge.classList.remove('hidden');
+        else badge.classList.add('hidden');
+    }
+}
+
 // Load state from server API or localStorage fallback
 async function loadState() {
+    updateHeaderUserBadge();
     let apiUrl = '/api/data';
     if (window.location.protocol === 'file:') {
         apiUrl = 'http://localhost:8080/api/data';
     }
 
     try {
-        const res = await fetch(apiUrl);
+        const res = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+
+        if (res.status === 401 && !authToken) {
+            openAuthModal();
+            return;
+        }
+
         if (res.ok) {
             const data = await res.json();
-            if (data && Array.isArray(data.wallets) && data.wallets.length > 0) {
+            if (data && Array.isArray(data.wallets)) {
                 state = data;
-                localStorage.setItem('financial_tracker_data_v1', JSON.stringify(state));
+                localStorage.setItem(`financial_tracker_data_${currentUser}`, JSON.stringify(state));
+                closeAuthModal();
                 updateUI();
                 return;
             }
@@ -117,11 +143,11 @@ async function loadState() {
     }
 
     // LocalStorage fallback
-    const saved = localStorage.getItem('financial_tracker_data_v1');
+    const saved = localStorage.getItem(`financial_tracker_data_${currentUser}`);
     if (saved) {
         try {
             const parsed = JSON.parse(saved);
-            if (parsed && Array.isArray(parsed.wallets) && parsed.wallets.length > 0) {
+            if (parsed && Array.isArray(parsed.wallets)) {
                 state = parsed;
             }
         } catch (e) {
@@ -133,7 +159,7 @@ async function loadState() {
 
 // Save state to server API & LocalStorage
 async function saveState() {
-    localStorage.setItem('financial_tracker_data_v1', JSON.stringify(state));
+    localStorage.setItem(`financial_tracker_data_${currentUser}`, JSON.stringify(state));
     let apiUrl = '/api/data';
     if (window.location.protocol === 'file:') {
         apiUrl = 'http://localhost:8080/api/data';
@@ -141,7 +167,10 @@ async function saveState() {
     try {
         await fetch(apiUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
             body: JSON.stringify(state)
         });
     } catch (e) {
@@ -156,15 +185,19 @@ setInterval(async () => {
         apiUrl = 'http://localhost:8080/api/data';
     }
     try {
-        const res = await fetch(apiUrl);
+        const res = await fetch(apiUrl, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
         if (res.ok) {
             const data = await res.json();
-            if (data && Array.isArray(data.wallets) && data.wallets.length > 0) {
+            if (data && Array.isArray(data.wallets)) {
                 const currentStr = JSON.stringify(state);
                 const serverStr = JSON.stringify(data);
                 if (currentStr !== serverStr) {
                     state = data;
-                    localStorage.setItem('financial_tracker_data_v1', serverStr);
+                    localStorage.setItem(`financial_tracker_data_${currentUser}`, serverStr);
                     updateUI();
                 }
             }
@@ -1249,4 +1282,109 @@ function showToast(message, type = 'info') {
         toast.classList.add('opacity-0', '-translate-y-2');
         setTimeout(() => toast.remove(), 300);
     }, 3500);
+}
+
+/* Authentication UI Handlers */
+function openAuthModal() {
+    document.getElementById('auth-modal')?.classList.remove('hidden');
+}
+
+function closeAuthModal() {
+    document.getElementById('auth-modal')?.classList.add('hidden');
+}
+
+function switchAuthTab(tab) {
+    const loginForm = document.getElementById('login-form');
+    const regForm = document.getElementById('register-form');
+    const loginTab = document.getElementById('auth-tab-login');
+    const regTab = document.getElementById('auth-tab-register');
+
+    if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        regForm.classList.add('hidden');
+        loginTab.className = 'flex-1 py-2 text-xs font-bold rounded-xl transition bg-brand-600 text-white';
+        regTab.className = 'flex-1 py-2 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white';
+    } else {
+        loginForm.classList.add('hidden');
+        regForm.classList.remove('hidden');
+        loginTab.className = 'flex-1 py-2 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white';
+        regTab.className = 'flex-1 py-2 text-xs font-bold rounded-xl transition bg-emerald-600 text-white';
+    }
+}
+
+async function handleLoginSubmit(e) {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    let apiUrl = '/api/login';
+    if (window.location.protocol === 'file:') apiUrl = 'http://localhost:8080/api/login';
+
+    try {
+        const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            authToken = data.token;
+            currentUser = data.username;
+            localStorage.setItem('financial_tracker_token', authToken);
+            localStorage.setItem('financial_tracker_user', currentUser);
+            
+            showToast(`أهلاً بك يا ${currentUser}! تم تسجيل الدخول بنجاح`, 'success');
+            closeAuthModal();
+            loadState();
+        } else {
+            showToast(data.error || 'فشل تسجيل الدخول', 'danger');
+        }
+    } catch (e) {
+        showToast('حدث خطأ في الاتصال بالخادم', 'danger');
+    }
+}
+
+async function handleRegisterSubmit(e) {
+    e.preventDefault();
+    const username = document.getElementById('reg-username').value.trim();
+    const password = document.getElementById('reg-password').value;
+
+    let apiUrl = '/api/register';
+    if (window.location.protocol === 'file:') apiUrl = 'http://localhost:8080/api/register';
+
+    try {
+        const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            authToken = data.token;
+            currentUser = data.username;
+            localStorage.setItem('financial_tracker_token', authToken);
+            localStorage.setItem('financial_tracker_user', currentUser);
+            
+            showToast(`مرحباً بك يا ${currentUser}! تم إنشاء حسابك بنجاح`, 'success');
+            closeAuthModal();
+            loadState();
+        } else {
+            showToast(data.error || 'فشل إنشاء الحساب', 'danger');
+        }
+    } catch (e) {
+        showToast('حدث خطأ في الاتصال بالخادم', 'danger');
+    }
+}
+
+function handleLogout() {
+    if (!confirm('هل تريد تسجيل الخروج من حسابك؟')) return;
+    authToken = '';
+    currentUser = '';
+    localStorage.removeItem('financial_tracker_token');
+    localStorage.removeItem('financial_tracker_user');
+    updateHeaderUserBadge();
+    openAuthModal();
+    showToast('تم تسجيل الخروج', 'info');
 }
