@@ -190,7 +190,9 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const url = req.url.split('?')[0];
+    const parsedUrl = new URL(req.url, 'http://localhost');
+    const rawPath = parsedUrl.searchParams.get('_orig_path') || req.headers['x-matched-path'] || req.headers['x-invoke-path'] || req.url || '';
+    const url = rawPath.split('?')[0];
 
     // ── Static Files Serving ──────────────────────────────────────────────────
     if (url === '/' || url === '/index.html') {
