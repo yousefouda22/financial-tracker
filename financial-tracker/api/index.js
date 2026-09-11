@@ -191,8 +191,21 @@ module.exports = async (req, res) => {
     }
 
     const parsedUrl = new URL(req.url, 'http://localhost');
-    const rawPath = parsedUrl.searchParams.get('_orig_path') || req.headers['x-matched-path'] || req.headers['x-invoke-path'] || req.url || '';
+    const qPath = (req.query && req.query._orig_path) || parsedUrl.searchParams.get('_orig_path');
+    const rawPath = qPath || req.headers['x-forwarded-uri'] || req.headers['x-vercel-matched-path'] || req.headers['x-matched-path'] || req.headers['x-invoke-path'] || req.url || '';
     const url = rawPath.split('?')[0];
+
+    if (req.url.includes('debug') || url.includes('debug')) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({
+            reqUrl: req.url,
+            query: req.query,
+            qPath,
+            rawPath,
+            url,
+            headers: req.headers
+        }, null, 2));
+    }
 
     // ── Static Files Serving ──────────────────────────────────────────────────
     if (url === '/' || url === '/index.html') {
