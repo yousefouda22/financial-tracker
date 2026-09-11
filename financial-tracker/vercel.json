@@ -1,9 +1,21 @@
 {
   "version": 2,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/index"
+      "src": "/api/(.*)",
+      "dest": "/api/index"
+    },
+    {
+      "src": "/app\\.js",
+      "dest": "/public/app.js"
+    },
+    {
+      "src": "/styles\\.css",
+      "dest": "/public/styles.css"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/index.html"
     }
   ]
 }
