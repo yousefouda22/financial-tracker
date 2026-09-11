@@ -1,0 +1,11 @@
+{
+  "name": "financial-tracker-bot",
+  "version": "1.0.0",
+  "description": "Multi-currency financial tracker with interactive Telegram bot",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
