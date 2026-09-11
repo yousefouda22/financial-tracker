@@ -2,9 +2,9 @@
   "name": "financial-tracker-bot",
   "version": "1.0.0",
   "description": "Multi-currency financial tracker with interactive Telegram bot",
-  "main": "server.js",
+  "main": "api/index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node api/index.js"
   },
   "engines": {
     "node": ">=18.0.0"
