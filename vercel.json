@@ -2,8 +2,8 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/server.js"
+      "source": "/:path*",
+      "destination": "/server.js?_path=/:path*"
     }
   ]
 }

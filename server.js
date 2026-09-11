@@ -182,7 +182,11 @@ const requestHandler = async (req, res) => {
         return res.end();
     }
 
-    const rawUrl = req.url.split('?')[0];
+    const parsedUrl = new URL(req.url, 'http://localhost');
+    const pathFromQuery = parsedUrl.searchParams.get('_path');
+    const pathFromHeader = req.headers['x-matched-path'] || req.headers['x-forwarded-uri'];
+    const activePath = pathFromQuery || pathFromHeader || req.url;
+    const rawUrl = activePath.split('?')[0];
 
     // ── Static Frontend Serving ───────────────────────────────────────────────
     if (rawUrl === '/' || rawUrl === '/index.html') {
