@@ -5,7 +5,27 @@
 
 const https = require('https');
 const fs = require('fs');
+const path = require('path');
 const crypto = require('crypto');
+
+// Helper to reliably find and read static files on Vercel
+function getStaticFile(filename) {
+    const candidatePaths = [
+        path.join(__dirname, '../public', filename),
+        path.join(__dirname, 'public', filename),
+        path.join(process.cwd(), 'public', filename),
+        path.join(process.cwd(), 'financial-tracker', 'public', filename),
+        path.join(__dirname, '..', filename)
+    ];
+    for (const p of candidatePaths) {
+        try {
+            if (fs.existsSync(p)) {
+                return fs.readFileSync(p);
+            }
+        } catch (e) {}
+    }
+    return null;
+}
 
 // In Vercel, use /tmp for writable storage
 const DATA_FILE = '/tmp/financial_tracker_data.json';
@@ -172,7 +192,30 @@ module.exports = async (req, res) => {
 
     const url = req.url.split('?')[0];
 
-    // ── Register ──────────────────────────────────────────────────────────────
+    // ── Static Files Serving ──────────────────────────────────────────────────
+    if (url === '/' || url === '/index.html') {
+        const content = getStaticFile('index.html');
+        if (content) {
+            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+            return res.end(content);
+        }
+    }
+
+    if (url === '/app.js' || url.endsWith('/app.js')) {
+        const content = getStaticFile('app.js');
+        if (content) {
+            res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8' });
+            return res.end(content);
+        }
+    }
+
+    if (url === '/styles.css' || url.endsWith('/styles.css')) {
+        const content = getStaticFile('styles.css');
+        if (content) {
+            res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8' });
+            return res.end(content);
+        }
+    }
     if (url === '/api/register' && req.method === 'POST') {
         try {
             const { username, password } = await parseBody(req);
