@@ -231,7 +231,8 @@ module.exports = async (req, res) => {
             return res.end(content);
         }
     }
-    if (url === '/api/register' && req.method === 'POST') {
+    // ── Register ──────────────────────────────────────────────────────────────
+    if ((url.includes('register') || req.url.includes('register')) && req.method === 'POST') {
         try {
             const { username, password } = await parseBody(req);
             const cleanUser = (username || '').trim().toLowerCase();
@@ -259,7 +260,7 @@ module.exports = async (req, res) => {
     }
 
     // ── Login ─────────────────────────────────────────────────────────────────
-    if (url === '/api/login' && req.method === 'POST') {
+    if ((url.includes('login') || req.url.includes('login')) && req.method === 'POST') {
         try {
             const { username, password } = await parseBody(req);
             const cleanUser = (username || '').trim().toLowerCase();
@@ -281,7 +282,7 @@ module.exports = async (req, res) => {
     }
 
     // ── Data GET/POST ─────────────────────────────────────────────────────────
-    if (url === '/api/data' || url.startsWith('/api/data?')) {
+    if (url.includes('data') || req.url.includes('data')) {
         const userId = getUserIdFromRequest(req);
         const targetUserId = userId || (db.users[0] ? db.users[0].id : null);
         if (!targetUserId) {
@@ -318,7 +319,7 @@ module.exports = async (req, res) => {
     }
 
     // ── Test Telegram ─────────────────────────────────────────────────────────
-    if (url === '/api/test-telegram' && req.method === 'POST') {
+    if ((url.includes('test-telegram') || req.url.includes('test-telegram')) && req.method === 'POST') {
         try {
             const { botToken, chatId } = await parseBody(req);
             const testMsg = `🔔 <b>إشعار تجريبي من موقع محفظتي المالية!</b>\n\nتم تفعيل البوت التفاعلي الذكي بنجاح!\n• <code>خصم 50 بنك فلسطين</code>\n• <code>شحن 100 بايننس</code>`;
