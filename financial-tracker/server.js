@@ -147,8 +147,68 @@ function callTelegramApi(botToken, method, payload) {
     });
 }
 
-function sendTelegramMessage(botToken, chatId, text) {
-    return callTelegramApi(botToken, 'sendMessage', { chat_id: chatId, text, parse_mode: 'HTML' });
+const MAIN_KEYBOARD = {
+    keyboard: [
+        [{ text: '📊 الرصيد الإجمالي' }, { text: '💳 أرصدة المحافظ' }],
+        [{ text: '🗓️ كم صرفت الشهر هاد' }, { text: '📈 كم دخلت الشهر هاد' }],
+        [{ text: '🤝 الديون والتزاماتي' }, { text: '❓ تعليمات وإضافة سريع' }]
+    ],
+    resize_keyboard: true,
+    persistent: true
+};
+
+const CAT_NAMES = {
+    food: 'طعام ومأكولات 🍔',
+    bills: 'فواتير واشتراكات 🧾',
+    shopping: 'تسوق وأغراض 🛍️',
+    transport: 'مواصلات وبنزين 🚗',
+    health: 'صحة وعلاج 🏥',
+    home: 'البيت والمستلزمات 🏠',
+    salary: 'راتب شهري 💵',
+    debt_payment: 'تسديد ديون والتزامات 🤝',
+    other_exp: 'مصاريف أخرى 📦',
+    other_inc: 'دخل آخر 🪙'
+};
+
+function sendTelegramMessage(botToken, chatId, text, replyMarkup = null) {
+    const payload = {
+        chat_id: chatId,
+        text: text,
+        parse_mode: 'HTML'
+    };
+    if (replyMarkup) payload.reply_markup = replyMarkup;
+    return callTelegramApi(botToken, 'sendMessage', payload);
+}
+
+async function notifyTelegramNewTransaction(telegramConfig, transaction, wallet, updatedBalance) {
+    if (!telegramConfig || !telegramConfig.enabled || !telegramConfig.botToken || !telegramConfig.chatId) {
+        return;
+    }
+
+    const isExpense = transaction.type === 'expense';
+    const title = isExpense ? '🚨 <b>عملية خصم جديدة (شريت)</b>' : '🎉 <b>عملية دخل جديدة (إضافة)</b>';
+    const symbol = transaction.currency === 'USD' ? '$' : '₪';
+    const catName = CAT_NAMES[transaction.category] || transaction.category || 'عام';
+    const walletName = wallet ? wallet.name : 'غير محدد';
+    const noteText = transaction.note ? `\n📝 <b>الملاحظة:</b> ${transaction.note}` : '';
+    const dateStr = new Date(transaction.date).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
+    const balanceStr = updatedBalance !== undefined ? `\n💳 <b>الرصيد الجديد بالمحفظة:</b> ${updatedBalance.toFixed(2)} ${symbol}` : '';
+
+    const message = `${title}
+
+💰 <b>المبلغ:</b> ${isExpense ? '-' : '+'}${transaction.amount} ${symbol}
+🏦 <b>المحفظة:</b> ${walletName}
+🏷️ <b>التصنيف:</b> ${catName}${noteText}
+📅 <b>التاريخ:</b> ${dateStr}${balanceStr}
+
+———————————————
+✅ <i>تم التحديث عبر موقع محفظتي المالية</i>`;
+
+    try {
+        await sendTelegramMessage(telegramConfig.botToken, telegramConfig.chatId, message, MAIN_KEYBOARD);
+    } catch (err) {
+        console.error('Telegram notification error:', err.message);
+    }
 }
 
 // ─── Static Files Cache / Helper ──────────────────────────────────────────────
@@ -281,8 +341,23 @@ const requestHandler = async (req, res) => {
         if (req.method === 'POST') {
             try {
                 const parsed = await parseBody(req);
+                const oldState = db.userStates[targetUserId] || {};
+                const oldTransIds = new Set((oldState.transactions || []).map(t => t.id));
+                const newTransactions = (parsed.transactions || []).filter(t => !oldTransIds.has(t.id));
+
                 db.userStates[targetUserId] = parsed;
                 saveDB();
+
+                const updatedWallets = calculateWalletBalances(parsed);
+
+                if (newTransactions.length > 0 && parsed.telegramConfig && parsed.telegramConfig.enabled) {
+                    for (const t of newTransactions) {
+                        const wallet = updatedWallets.find(w => w.id === t.walletId);
+                        const remBal = wallet ? wallet.currentBalance : undefined;
+                        await notifyTelegramNewTransaction(parsed.telegramConfig, t, wallet, remBal);
+                    }
+                }
+
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 return res.end(JSON.stringify({ success: true }));
             } catch (e) {
