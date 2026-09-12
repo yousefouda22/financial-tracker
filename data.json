@@ -1,1 +1,51 @@
-{"users":[],"sessions":{},"userStates":{}}
+{
+    "users":  [
+                  {
+                      "username":  "yousef",
+                      "createdAt":  "2026-09-13T00:26:29.4044146+03:00",
+                      "id":  "u_default",
+                      "passwordHash":  "4d6d67e6f6630f9a2b53b82df23d7560e9487b32c668612140bb6f1839556857"
+                  }
+              ],
+    "sessions":  {
+
+                 },
+    "userStates":  {
+                       "u_default":  {
+                                         "transactions":  [
+
+                                                          ],
+                                         "wallets":  [
+                                                         {
+                                                             "currency":  "ILS",
+                                                             "initialBalance":  1500,
+                                                             "name":  "بنك فلسطين",
+                                                             "id":  "w1",
+                                                             "icon":  "fa-building-columns"
+                                                         },
+                                                         {
+                                                             "currency":  "ILS",
+                                                             "initialBalance":  300,
+                                                             "name":  "كاش / محفظة شخصية",
+                                                             "id":  "w2",
+                                                             "icon":  "fa-wallet"
+                                                         },
+                                                         {
+                                                             "currency":  "USD",
+                                                             "initialBalance":  250,
+                                                             "name":  "حساب الدولار (بنك/بايبال)",
+                                                             "id":  "w3",
+                                                             "icon":  "fa-vault"
+                                                         }
+                                                     ],
+                                         "telegramConfig":  {
+                                                                "chatId":  "",
+                                                                "botToken":  "",
+                                                                "enabled":  false
+                                                            },
+                                         "debts":  [
+
+                                                   ]
+                                     }
+                   }
+}
