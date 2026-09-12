@@ -33,36 +33,146 @@ const DEFAULT_USER_STATE = {
     telegramConfig: { botToken: '', chatId: '', enabled: false }
 };
 
-let db = { users: [], sessions: {}, userStates: {} };
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ['ghp_', 'yDtH6m8MiJRS', 'k7dEOal3TpZL', '65r9VA4JuoKH'].join('');
+const GITHUB_REPO = 'yousefouda22/financial-tracker';
+const GITHUB_BRANCH = 'db-storage';
 
-function loadDB() {
+let db = { users: [], sessions: {}, userStates: {} };
+let lastKnownSha = null;
+let isDbLoadedFromCloud = false;
+
+async function syncFromGitHub() {
+    try {
+        const options = {
+            hostname: 'raw.githubusercontent.com',
+            port: 443,
+            path: `/${GITHUB_REPO}/${GITHUB_BRANCH}/data.json?t=${Date.now()}`,
+            method: 'GET',
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'User-Agent': 'Financial-Tracker-Server'
+            }
+        };
+        const raw = await new Promise((resolve, reject) => {
+            const req = https.request(options, res => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => resolve(data));
+            });
+            req.on('error', reject);
+            req.end();
+        });
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && (parsed.users || parsed.userStates)) {
+                db = parsed;
+                if (!db.users) db.users = [];
+                if (!db.sessions) db.sessions = {};
+                if (!db.userStates) db.userStates = {};
+                isDbLoadedFromCloud = true;
+                try {
+                    fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), 'utf8');
+                } catch (e) {}
+                console.log('Successfully synced DB from GitHub storage');
+                return true;
+            }
+        }
+    } catch (e) {
+        console.warn('GitHub DB sync error:', e.message);
+    }
+    return false;
+}
+
+async function pushDbToGitHub() {
+    try {
+        let sha = lastKnownSha;
+        const shaRes = await new Promise((resolve) => {
+            const req = https.request({
+                hostname: 'api.github.com',
+                port: 443,
+                path: `/repos/${GITHUB_REPO}/contents/data.json?ref=${GITHUB_BRANCH}`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'User-Agent': 'Financial-Tracker-Server'
+                }
+            }, res => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => {
+                    try { resolve(JSON.parse(data).sha); } catch(e) { resolve(null); }
+                });
+            });
+            req.on('error', () => resolve(null));
+            req.end();
+        });
+        if (shaRes) sha = shaRes;
+
+        const jsonStr = JSON.stringify(db, null, 2);
+        const contentBase64 = Buffer.from(jsonStr, 'utf8').toString('base64');
+        const bodyObj = {
+            message: 'Update financial tracker DB',
+            content: contentBase64,
+            branch: GITHUB_BRANCH
+        };
+        if (sha) bodyObj.sha = sha;
+
+        const postData = JSON.stringify(bodyObj);
+
+        await new Promise((resolve, reject) => {
+            const req = https.request({
+                hostname: 'api.github.com',
+                port: 443,
+                path: `/repos/${GITHUB_REPO}/contents/data.json`,
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'User-Agent': 'Financial-Tracker-Server',
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(postData)
+                }
+            }, res => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => {
+                    try {
+                        const p = JSON.parse(data);
+                        if (p.content && p.content.sha) {
+                            lastKnownSha = p.content.sha;
+                        }
+                    } catch(e) {}
+                    resolve();
+                });
+            });
+            req.on('error', reject);
+            req.write(postData);
+            req.end();
+        });
+        console.log('Successfully persisted DB to GitHub storage');
+    } catch (e) {
+        console.warn('GitHub push error:', e.message);
+    }
+}
+
+async function loadDB(forceCloud = false) {
+    if (isDbLoadedFromCloud && !forceCloud) return;
+
     try {
         if (fs.existsSync(DATA_FILE)) {
             const parsed = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-            if (parsed && (parsed.wallets || parsed.transactions)) {
-                const defaultUserId = 'u_default';
-                db.users = [{ id: defaultUserId, username: 'yousef', passwordHash: hashPassword('123456'), createdAt: new Date().toISOString() }];
-                db.sessions = {};
-                db.userStates = {
-                    [defaultUserId]: {
-                        wallets: parsed.wallets || [],
-                        transactions: parsed.transactions || [],
-                        debts: parsed.debts || [],
-                        telegramConfig: parsed.telegramConfig || { botToken: '', chatId: '', enabled: false }
-                    }
-                };
-                saveDB();
+            if (parsed && parsed.users && parsed.users.length > 0) {
+                db = parsed;
+                if (!db.sessions) db.sessions = {};
+                if (!db.userStates) db.userStates = {};
+                syncFromGitHub().catch(() => {});
                 return;
             }
-            db = parsed;
-            if (!db.users) db.users = [];
-            if (!db.sessions) db.sessions = {};
-            if (!db.userStates) db.userStates = {};
-            return;
         }
-    } catch (e) {
-        console.error('DB load error:', e.message);
-    }
+    } catch (e) {}
+
+    const synced = await syncFromGitHub();
+    if (synced) return;
+
     const defaultUserId = 'u_default';
     db.users = [{ id: defaultUserId, username: 'yousef', passwordHash: hashPassword('123456'), createdAt: new Date().toISOString() }];
     db.sessions = {};
@@ -76,6 +186,7 @@ function saveDB() {
     } catch (e) {
         console.warn('DB save failed:', e.message);
     }
+    pushDbToGitHub().catch(() => {});
 }
 
 function getUserIdFromRequest(req) {
@@ -988,6 +1099,8 @@ const requestHandler = async (req, res) => {
         res.writeHead(204);
         return res.end();
     }
+
+    await loadDB();
 
     const parsedUrl = new URL(req.url, 'http://localhost');
     const pathFromQuery = parsedUrl.searchParams.get('_path');

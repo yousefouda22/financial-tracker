@@ -112,6 +112,21 @@ function updateHeaderUserBadge() {
 // Load state from server API or localStorage fallback
 async function loadState() {
     updateHeaderUserBadge();
+
+    // 1. First render immediately from localStorage so data never blinks or resets!
+    const saved = localStorage.getItem(`financial_tracker_data_${currentUser}`);
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            if (parsed && Array.isArray(parsed.wallets)) {
+                state = parsed;
+                updateUI();
+            }
+        } catch (e) {
+            console.error('Failed to parse saved data:', e);
+        }
+    }
+
     let apiUrl = '/api/data';
     if (window.location.protocol === 'file:') {
         apiUrl = 'http://localhost:8080/api/data';
@@ -132,6 +147,18 @@ async function loadState() {
         if (res.ok) {
             const data = await res.json();
             if (data && Array.isArray(data.wallets)) {
+                const localTxCount = (state.transactions || []).length;
+                const serverTxCount = (data.transactions || []).length;
+
+                // Protect local data: if local has transactions and server is empty default, upload local to server!
+                if (localTxCount > 0 && serverTxCount === 0) {
+                    console.log('Protecting data: syncing richer local data to server...');
+                    saveState();
+                    closeAuthModal();
+                    return;
+                }
+
+                // Adopt server data
                 state = data;
                 localStorage.setItem(`financial_tracker_data_${currentUser}`, JSON.stringify(state));
                 closeAuthModal();
@@ -142,20 +169,6 @@ async function loadState() {
     } catch (e) {
         console.warn('Server API not reachable:', e);
     }
-
-    // LocalStorage fallback
-    const saved = localStorage.getItem(`financial_tracker_data_${currentUser}`);
-    if (saved) {
-        try {
-            const parsed = JSON.parse(saved);
-            if (parsed && Array.isArray(parsed.wallets)) {
-                state = parsed;
-            }
-        } catch (e) {
-            console.error('Failed to parse saved data:', e);
-        }
-    }
-    updateUI();
 }
 
 // Save state to server API & LocalStorage
@@ -179,8 +192,9 @@ async function saveState() {
     }
 }
 
-// Auto-sync polling every 3 seconds for live multi-device updates
+// Auto-sync polling every 10 seconds (only sync when safe)
 setInterval(async () => {
+    if (!authToken) return;
     let apiUrl = '/api/data';
     if (window.location.protocol === 'file:') {
         apiUrl = 'http://localhost:8080/api/data';
@@ -194,6 +208,15 @@ setInterval(async () => {
         if (res.ok) {
             const data = await res.json();
             if (data && Array.isArray(data.wallets)) {
+                const localTxCount = (state.transactions || []).length;
+                const serverTxCount = (data.transactions || []).length;
+
+                // Never overwrite local transactions with an empty list
+                if (localTxCount > 0 && serverTxCount === 0) {
+                    saveState();
+                    return;
+                }
+
                 const currentStr = JSON.stringify(state);
                 const serverStr = JSON.stringify(data);
                 if (currentStr !== serverStr) {
@@ -206,7 +229,7 @@ setInterval(async () => {
     } catch (e) {
         // Silent fail if offline
     }
-}, 3000);
+}, 10000);
 
 // Set default datetime to now in modals
 function setDefaultDateInput() {
