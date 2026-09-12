@@ -184,6 +184,16 @@
           "category": "other_exp",
           "note": "عبر لوحة تحكم التليجرام",
           "date": "2026-09-12T21:41:56.184Z"
+        },
+        {
+          "id": "t_1789249328759",
+          "type": "expense",
+          "walletId": "w_1789166841277",
+          "amount": 16,
+          "currency": "ILS",
+          "category": "other_exp",
+          "note": "عبر لوحة تحكم التليجرام",
+          "date": "2026-09-12T21:42:08.759Z"
         }
       ],
       "debts": [
