@@ -237,22 +237,6 @@
     "u_1789313069928": {
       "wallets": [
         {
-          "id": "w_1789166399051",
-          "name": "حساب جاري بنك فلسطين",
-          "currency": "USD",
-          "initialBalance": 7283,
-          "icon": "fa-building-columns",
-          "currentBalance": 7284
-        },
-        {
-          "id": "w_1789166445635",
-          "name": "حساب توفير بنك فلسطين",
-          "currency": "USD",
-          "initialBalance": 834,
-          "icon": "fa-building-columns",
-          "currentBalance": 834
-        },
-        {
           "id": "w_1789166465427",
           "name": "حساب جاري بنك فلسطين",
           "currency": "ILS",
@@ -371,16 +355,6 @@
           "date": "2026-09-11T22:49:00.000Z"
         },
         {
-          "id": "t_1789168079727",
-          "type": "income",
-          "walletId": "w_1789166399051",
-          "amount": 1,
-          "currency": "USD",
-          "category": "other_inc",
-          "note": "عبر لوحة تحكم التليجرام",
-          "date": "2026-09-11T23:07:59.727Z"
-        },
-        {
           "id": "t_1789249232295",
           "type": "expense",
           "walletId": "w_1789166465427",
@@ -419,16 +393,6 @@
           "category": "other_exp",
           "note": "عبر لوحة تحكم التليجرام",
           "date": "2026-09-12T21:42:08.759Z"
-        },
-        {
-          "id": "t_1789313104263",
-          "type": "income",
-          "walletId": "w_1789166399051",
-          "amount": 1,
-          "currency": "USD",
-          "category": "salary",
-          "note": "",
-          "date": "2026-09-13T15:24:00.000Z"
         }
       ],
       "debts": [
