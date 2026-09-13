@@ -5,9 +5,17 @@
       "createdAt": "2026-09-13T00:26:29.4044146+03:00",
       "id": "u_default",
       "passwordHash": "4d6d67e6f6630f9a2b53b82df23d7560e9487b32c668612140bb6f1839556857"
+    },
+    {
+      "id": "u_1789313069928",
+      "username": "ابراهيم",
+      "passwordHash": "1780b12ba3435bcd018c9b0170cf51f2d1d7c7b52c097713e8e87cfd37aa3ce7",
+      "createdAt": "2026-09-13T15:24:29.928Z"
     }
   ],
-  "sessions": {},
+  "sessions": {
+    "60614329e18d437631f5140166e351a5e9483d9fbed093783a08fa5b781b3aa4": "u_1789313069928"
+  },
   "userStates": {
     "u_default": {
       "wallets": [
@@ -45,7 +53,7 @@
         },
         {
           "id": "w_1789166530197",
-          "name": "باي بت",
+          "name": "باي ��ت",
           "currency": "USD",
           "initialBalance": 1967,
           "icon": "fa-wallet",
@@ -122,6 +130,223 @@
           "initialBalance": 4,
           "icon": "fa-money-check",
           "currentBalance": 1
+        }
+      ],
+      "transactions": [
+        {
+          "id": "t_1789166925350",
+          "type": "expense",
+          "walletId": "w_1789166841277",
+          "amount": 1,
+          "currency": "ILS",
+          "category": "food",
+          "note": "",
+          "date": "2026-09-11T22:48:00.000Z"
+        },
+        {
+          "id": "t_1789166954117",
+          "type": "expense",
+          "walletId": "w_1789166841277",
+          "amount": 2,
+          "currency": "ILS",
+          "category": "food",
+          "note": "",
+          "date": "2026-09-11T22:49:00.000Z"
+        },
+        {
+          "id": "t_1789168079727",
+          "type": "income",
+          "walletId": "w_1789166399051",
+          "amount": 1,
+          "currency": "USD",
+          "category": "other_inc",
+          "note": "عبر لوحة تحكم التليجرام",
+          "date": "2026-09-11T23:07:59.727Z"
+        },
+        {
+          "id": "t_1789249232295",
+          "type": "expense",
+          "walletId": "w_1789166465427",
+          "amount": 68,
+          "currency": "ILS",
+          "category": "other_exp",
+          "note": "عبر لوحة تحكم التليجرام",
+          "date": "2026-09-12T21:40:32.295Z"
+        },
+        {
+          "id": "t_1789249300949",
+          "type": "expense",
+          "walletId": "w_1789166841277",
+          "amount": 26,
+          "currency": "ILS",
+          "category": "other_exp",
+          "note": "عبر لوحة تحكم التليجرام",
+          "date": "2026-09-12T21:41:40.949Z"
+        },
+        {
+          "id": "t_1789249316184",
+          "type": "expense",
+          "walletId": "w_1789166841277",
+          "amount": 33,
+          "currency": "ILS",
+          "category": "other_exp",
+          "note": "عبر لوحة تحكم التليجرام",
+          "date": "2026-09-12T21:41:56.184Z"
+        },
+        {
+          "id": "t_1789249328759",
+          "type": "expense",
+          "walletId": "w_1789166841277",
+          "amount": 16,
+          "currency": "ILS",
+          "category": "other_exp",
+          "note": "عبر لوحة تحكم التليجرام",
+          "date": "2026-09-12T21:42:08.759Z"
+        }
+      ],
+      "debts": [
+        {
+          "id": "d_1789168118325",
+          "type": "receivable",
+          "person": "مؤمن",
+          "amount": 87,
+          "currency": "ILS",
+          "settledAmount": 0,
+          "note": "شيشة وشاورما",
+          "dueDate": "",
+          "status": "pending"
+        },
+        {
+          "id": "d_1789168154530",
+          "type": "receivable",
+          "person": "اليوتيوبر",
+          "amount": 25,
+          "currency": "USD",
+          "settledAmount": 0,
+          "note": "IDM",
+          "dueDate": "",
+          "status": "pending"
+        }
+      ],
+      "telegramConfig": {
+        "enabled": true,
+        "botToken": "8895462921:AAGp8tGtYP3-JVkoh4Rq_wgoEkKHGEoyceU",
+        "chatId": "1327968743"
+      }
+    },
+    "u_1789313069928": {
+      "wallets": [
+        {
+          "id": "w_1789166399051",
+          "name": "حساب جاري بنك فلسطين",
+          "currency": "USD",
+          "initialBalance": 7283,
+          "icon": "fa-building-columns",
+          "currentBalance": 7284
+        },
+        {
+          "id": "w_1789166445635",
+          "name": "حساب توفير بنك فلسطين",
+          "currency": "USD",
+          "initialBalance": 834,
+          "icon": "fa-building-columns",
+          "currentBalance": 834
+        },
+        {
+          "id": "w_1789166465427",
+          "name": "حساب جاري بنك فلسطين",
+          "currency": "ILS",
+          "initialBalance": 13,
+          "icon": "fa-building-columns",
+          "currentBalance": -55
+        },
+        {
+          "id": "w_1789166479853",
+          "name": "حساب توفير بنك فلسطين",
+          "currency": "ILS",
+          "initialBalance": 16,
+          "icon": "fa-building-columns",
+          "currentBalance": 16
+        },
+        {
+          "id": "w_1789166530197",
+          "name": "باي ��ت",
+          "currency": "USD",
+          "initialBalance": 1967,
+          "icon": "fa-wallet",
+          "currentBalance": 1967
+        },
+        {
+          "id": "w_1789166556195",
+          "name": "بايننس",
+          "currency": "USD",
+          "initialBalance": 544,
+          "icon": "fa-wallet",
+          "currentBalance": 544
+        },
+        {
+          "id": "w_1789166599058",
+          "name": "كيوكوين",
+          "currency": "USD",
+          "initialBalance": 2099,
+          "icon": "fa-credit-card",
+          "currentBalance": 2099
+        },
+        {
+          "id": "w_1789166637781",
+          "name": "الهام اختي بنك فلسطين",
+          "currency": "USD",
+          "initialBalance": 2000,
+          "icon": "fa-credit-card",
+          "currentBalance": 2000
+        },
+        {
+          "id": "w_1789166656699",
+          "name": "ترست والت",
+          "currency": "USD",
+          "initialBalance": 8537,
+          "icon": "fa-credit-card",
+          "currentBalance": 8537
+        },
+        {
+          "id": "w_1789166723698",
+          "name": "احمد بنك فلسطين",
+          "currency": "USD",
+          "initialBalance": 1970,
+          "icon": "fa-credit-card",
+          "currentBalance": 1970
+        },
+        {
+          "id": "w_1789166760869",
+          "name": "ريدوت باي",
+          "currency": "USD",
+          "initialBalance": 67,
+          "icon": "fa-credit-card",
+          "currentBalance": 67
+        },
+        {
+          "id": "w_1789166773597",
+          "name": "ترست والت xs max",
+          "currency": "USD",
+          "initialBalance": 200,
+          "icon": "fa-credit-card",
+          "currentBalance": 200
+        },
+        {
+          "id": "w_1789166808928",
+          "name": "ترون والت",
+          "currency": "USD",
+          "initialBalance": 2190,
+          "icon": "fa-credit-card",
+          "currentBalance": 2190
+        },
+        {
+          "id": "w_1789166841277",
+          "name": "جوال باي",
+          "currency": "ILS",
+          "initialBalance": 4,
+          "icon": "fa-money-check",
+          "currentBalance": -74
         }
       ],
       "transactions": [
