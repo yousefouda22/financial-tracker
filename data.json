@@ -41,7 +41,7 @@
           "currency": "ILS",
           "initialBalance": 13,
           "icon": "fa-building-columns",
-          "currentBalance": 13
+          "currentBalance": -55
         },
         {
           "id": "w_1789166479853",
@@ -129,7 +129,7 @@
           "currency": "ILS",
           "initialBalance": 4,
           "icon": "fa-money-check",
-          "currentBalance": 1
+          "currentBalance": -74
         }
       ],
       "transactions": [
@@ -202,6 +202,16 @@
           "category": "other_exp",
           "note": "عبر لوحة تحكم التليجرام",
           "date": "2026-09-12T21:42:08.759Z"
+        },
+        {
+          "id": "t_1789409388948",
+          "type": "expense",
+          "walletId": "w_1789166465427",
+          "amount": 48,
+          "currency": "ILS",
+          "category": "food",
+          "note": "",
+          "date": "2026-09-14T18:09:00.000Z"
         }
       ],
       "debts": [
